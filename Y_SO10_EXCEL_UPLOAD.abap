@@ -114,7 +114,7 @@ CLASS lcl_application IMPLEMENTATION.
 
     cl_gui_frontend_services=>file_open_dialog(
       EXPORTING
-        window_title      = 'Выберите Excel файл'
+        window_title      = 'Select Excel file'
         default_extension = 'xlsx'
         file_filter       = 'Excel (*.xlsx)|*.xlsx|'
       CHANGING
@@ -156,7 +156,7 @@ CLASS lcl_application IMPLEMENTATION.
         OTHERS = 1 ).
 
     IF sy-subrc <> 0.
-      MESSAGE 'Ошибка загрузки Excel файла' TYPE 'E'.
+      MESSAGE 'Error loading Excel file' TYPE 'E'.
     ENDIF.
 
     CALL FUNCTION 'SCMS_BINARY_TO_XSTRING'
@@ -170,7 +170,7 @@ CLASS lcl_application IMPLEMENTATION.
         OTHERS       = 1.
 
     IF sy-subrc <> 0.
-      MESSAGE 'Ошибка преобразования Excel файла' TYPE 'E'.
+      MESSAGE 'Error converting Excel file' TYPE 'E'.
     ENDIF.
 
     TRY.
@@ -184,12 +184,12 @@ CLASS lcl_application IMPLEMENTATION.
     lo_excel->if_fdt_doc_spreadsheet~get_worksheet_names( IMPORTING worksheet_names = lt_worksheets ).
 
     IF lt_worksheets IS INITIAL.
-      MESSAGE 'Excel файл не содержит листов' TYPE 'E'.
+      MESSAGE 'Excel file contains no worksheets' TYPE 'E'.
     ENDIF.
 
     READ TABLE lt_worksheets INDEX 1 INTO lv_worksheet.
     IF sy-subrc <> 0.
-      MESSAGE 'Не удалось определить лист Excel' TYPE 'E'.
+      MESSAGE 'Could not determine Excel worksheet' TYPE 'E'.
     ENDIF.
 
     TRY.
@@ -207,7 +207,7 @@ CLASS lcl_application IMPLEMENTATION.
 
     ASSIGN lr_data->* TO <lt_excel>.
     IF <lt_excel> IS NOT ASSIGNED.
-      MESSAGE 'Не удалось получить данные Excel' TYPE 'E'.
+      MESSAGE 'Could not get Excel data' TYPE 'E'.
     ENDIF.
 
     LOOP AT <lt_excel> ASSIGNING <ls_excel>.
@@ -234,7 +234,7 @@ CLASS lcl_application IMPLEMENTATION.
     ENDLOOP.
 
     IF mt_excel IS INITIAL.
-      MESSAGE 'Excel не содержит данных для обработки' TYPE 'E'.
+      MESSAGE 'Excel contains no data to process' TYPE 'E'.
     ENDIF.
 
     mv_total = lines( mt_excel ).
@@ -265,7 +265,7 @@ CLASS lcl_application IMPLEMENTATION.
         iv_row     = iv_row
         iv_name    = ''
         iv_status  = mc_status-error
-        iv_message = 'Пустое имя SO10 текста' ).
+        iv_message = 'Empty SO10 text name' ).
       RETURN.
     ENDIF.
 
@@ -274,7 +274,7 @@ CLASS lcl_application IMPLEMENTATION.
         iv_row     = iv_row
         iv_name    = lv_name
         iv_status  = mc_status-error
-        iv_message = 'Пустое значение столбца "Содержимое"' ).
+        iv_message = 'Empty value in column "Content"' ).
       RETURN.
     ENDIF.
 
@@ -283,7 +283,7 @@ CLASS lcl_application IMPLEMENTATION.
         iv_row     = iv_row
         iv_name    = lv_name
         iv_status  = mc_status-error
-        iv_message = 'SO10 текст не найден' ).
+        iv_message = 'SO10 text not found' ).
       RETURN.
     ENDIF.
 
@@ -292,7 +292,7 @@ CLASS lcl_application IMPLEMENTATION.
         iv_row     = iv_row
         iv_name    = lv_name
         iv_status  = mc_status-check
-        iv_message = 'Текст найден. Изменение не выполнялось' ).
+        iv_message = 'Text found. No change performed' ).
       RETURN.
     ENDIF.
 
@@ -303,7 +303,7 @@ CLASS lcl_application IMPLEMENTATION.
         iv_row     = iv_row
         iv_name    = lv_name
         iv_status  = mc_status-error
-        iv_message = 'Не удалось преобразовать содержимое в TLINE' ).
+        iv_message = 'Could not convert content to TLINE' ).
       RETURN.
     ENDIF.
 
@@ -321,7 +321,7 @@ CLASS lcl_application IMPLEMENTATION.
         iv_row     = iv_row
         iv_name    = lv_name
         iv_status  = mc_status-error
-        iv_message = |SAVE_TEXT завершился ошибкой| ).
+        iv_message = |SAVE_TEXT ended with an error| ).
 
       ROLLBACK WORK.
       RETURN.
@@ -339,7 +339,7 @@ CLASS lcl_application IMPLEMENTATION.
         iv_row     = iv_row
         iv_name    = lv_name
         iv_status  = mc_status-error
-        iv_message = 'SAVE_TEXT выполнен, но READ_TEXT не вернул содержимое' ).
+        iv_message = 'SAVE_TEXT executed, but READ_TEXT did not return content' ).
 
       ROLLBACK WORK.
       RETURN.
@@ -353,7 +353,7 @@ CLASS lcl_application IMPLEMENTATION.
         iv_row     = iv_row
         iv_name    = lv_name
         iv_status  = mc_status-error
-        iv_message = 'Пост-проверка READ_TEXT: содержимое не совпадает' ).
+        iv_message = 'Post-check READ_TEXT: content does not match' ).
 
       ROLLBACK WORK.
       RETURN.
@@ -365,7 +365,7 @@ CLASS lcl_application IMPLEMENTATION.
       iv_row     = iv_row
       iv_name    = lv_name
       iv_status  = mc_status-updated
-      iv_message = 'Текст успешно перезаписан и проверен через READ_TEXT' ).
+      iv_message = 'Text successfully overwritten and verified via READ_TEXT' ).
   ENDMETHOD.
 
   METHOD check_text_exists.
@@ -542,33 +542,33 @@ CLASS lcl_application IMPLEMENTATION.
 
     TRY.
         lo_column ?= io_columns->get_column( 'ROW' ).
-        lo_column->set_long_text( 'Строка Excel' ).
-        lo_column->set_medium_text( 'Строка' ).
-        lo_column->set_short_text( '№' ).
+        lo_column->set_long_text( 'Excel row' ).
+        lo_column->set_medium_text( 'Row' ).
+        lo_column->set_short_text( 'No.' ).
       CATCH cx_salv_not_found.
     ENDTRY.
 
     TRY.
         lo_column ?= io_columns->get_column( 'NAME' ).
-        lo_column->set_long_text( 'Имя SO10 текста' ).
-        lo_column->set_medium_text( 'Имя текста' ).
-        lo_column->set_short_text( 'Имя' ).
+        lo_column->set_long_text( 'SO10 text name' ).
+        lo_column->set_medium_text( 'Text name' ).
+        lo_column->set_short_text( 'Name' ).
       CATCH cx_salv_not_found.
     ENDTRY.
 
     TRY.
         lo_column ?= io_columns->get_column( 'STATUS' ).
-        lo_column->set_long_text( 'Статус обработки' ).
-        lo_column->set_medium_text( 'Статус' ).
-        lo_column->set_short_text( 'Статус' ).
+        lo_column->set_long_text( 'Processing status' ).
+        lo_column->set_medium_text( 'Status' ).
+        lo_column->set_short_text( 'Status' ).
       CATCH cx_salv_not_found.
     ENDTRY.
 
     TRY.
         lo_column ?= io_columns->get_column( 'MESSAGE' ).
-        lo_column->set_long_text( 'Сообщение' ).
-        lo_column->set_medium_text( 'Сообщение' ).
-        lo_column->set_short_text( 'Сообщение' ).
+        lo_column->set_long_text( 'Message' ).
+        lo_column->set_medium_text( 'Message' ).
+        lo_column->set_short_text( 'Message' ).
       CATCH cx_salv_not_found.
     ENDTRY.
 
@@ -588,41 +588,41 @@ CLASS lcl_application IMPLEMENTATION.
     lo_form = NEW cl_salv_form_layout_grid( ).
 
     lo_label = lo_form->create_label( row = 1 column = 1 ).
-    lo_label->set_text( 'Результат загрузки SO10' ).
+    lo_label->set_text( 'SO10 upload result' ).
 
     lo_label = lo_form->create_label( row = 2 column = 1 ).
-    lo_label->set_text( 'Всего строк:' ).
+    lo_label->set_text( 'Total rows:' ).
 
     lo_text = lo_form->create_text( row = 2 column = 2 ).
     lo_text->set_text( CONV string( mv_total ) ).
 
     lo_label = lo_form->create_label( row = 3 column = 1 ).
-    lo_label->set_text( 'Успешно изменено:' ).
+    lo_label->set_text( 'Updated successfully:' ).
 
     lo_text = lo_form->create_text( row = 3 column = 2 ).
     lo_text->set_text( CONV string( mv_updated ) ).
 
     lo_label = lo_form->create_label( row = 4 column = 1 ).
-    lo_label->set_text( 'Только проверено:' ).
+    lo_label->set_text( 'Checked only:' ).
 
     lo_text = lo_form->create_text( row = 4 column = 2 ).
     lo_text->set_text( CONV string( mv_checked ) ).
 
     lo_label = lo_form->create_label( row = 5 column = 1 ).
-    lo_label->set_text( 'Ошибок:' ).
+    lo_label->set_text( 'Errors:' ).
 
     lo_text = lo_form->create_text( row = 5 column = 2 ).
     lo_text->set_text( CONV string( mv_errors ) ).
 
     lo_label = lo_form->create_label( row = 6 column = 1 ).
-    lo_label->set_text( 'Режим:' ).
+    lo_label->set_text( 'Mode:' ).
 
     lo_text = lo_form->create_text( row = 6 column = 2 ).
     lo_text->set_text(
       COND string(
         WHEN p_test = abap_true
-        THEN 'Только проверка'
-        ELSE 'Изменение SO10' ) ).
+        THEN 'Check only'
+        ELSE 'Update SO10' ) ).
 
     io_alv->set_top_of_list( lo_form ).
   ENDMETHOD.
@@ -631,7 +631,7 @@ CLASS lcl_application IMPLEMENTATION.
     DATA lo_alv TYPE REF TO cl_salv_table.
 
     IF mt_log IS INITIAL.
-      MESSAGE 'Обработка завершена. Лог пуст.' TYPE 'I'.
+      MESSAGE 'Processing finished. Log is empty.' TYPE 'I'.
       RETURN.
     ENDIF.
 
@@ -679,8 +679,8 @@ CLASS lcl_application IMPLEMENTATION.
         id           = sy-tabix
         name         = ls_component-name
         display_name = COND string(
-          WHEN sy-tabix = 1 THEN 'Имя'
-          WHEN sy-tabix = 2 THEN 'Содержимое'
+          WHEN sy-tabix = 1 THEN 'Name'
+          WHEN sy-tabix = 2 THEN 'Content'
           ELSE ls_component-name )
         is_result    = abap_true
         type         = ls_component-type ) TO lt_columns.
@@ -699,12 +699,12 @@ CLASS lcl_application IMPLEMENTATION.
     ENDTRY.
 
     IF lv_xstring IS INITIAL.
-      MESSAGE 'Не удалось сформировать Excel-шаблон' TYPE 'E'.
+      MESSAGE 'Could not generate Excel template' TYPE 'E'.
     ENDIF.
 
     cl_gui_frontend_services=>file_save_dialog(
       EXPORTING
-        window_title      = 'Сохранить шаблон Excel'
+        window_title      = 'Save Excel template'
         default_extension = 'xlsx'
         default_file_name = 'SO10_TEMPLATE.xlsx'
         file_filter       = 'Excel (*.xlsx)|*.xlsx|'
@@ -734,10 +734,10 @@ CLASS lcl_application IMPLEMENTATION.
         OTHERS = 1 ).
 
     IF sy-subrc <> 0.
-      MESSAGE 'Ошибка сохранения Excel-шаблона' TYPE 'E'.
+      MESSAGE 'Error saving Excel template' TYPE 'E'.
     ENDIF.
 
-    MESSAGE 'Шаблон Excel успешно сохранён' TYPE 'S'.
+    MESSAGE 'Excel template saved successfully' TYPE 'S'.
   ENDMETHOD.
 
 ENDCLASS.
